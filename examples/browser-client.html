@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeepCoder AI API Demo</title>
+  <style>
+    :root {
+      --primary-color: #4a6baf;
+      --secondary-color: #7aa2f7;
+      --background-color: #f8f9fa;
+      --text-color: #333;
+      --border-radius: 8px;
+      --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      background-color: var(--background-color);
+      padding: 0;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      margin-bottom: 2rem;
+      border-radius: 0 0 var(--border-radius) var(--border-radius);
+      box-shadow: var(--box-shadow);
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .api-form {
+      background-color: white;
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      font-family: inherit;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: background-color 0.3s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    button:hover {
+      background-color: var(--secondary-color);
+    }
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      visibility: hidden;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .response-container {
+      background-color: white;
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      min-height: 200px;
+    }
+
+    .response-tabs {
+      display: flex;
+      margin-bottom: 1rem;
+      background-color: #eee;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+    }
+
+    .response-tabs button {
+      flex: 1;
+      padding: 0.8rem;
+      background: transparent;
+      color: var(--text-color);
+      border: none;
+      border-radius: 0;
+    }
+
+    .response-tabs button.active {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .response-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    .response-body {
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+
+    .response-content, .response-reasoning {
+      display: none;
+      padding: 0.5rem;
+      min-height: 200px;
+    }
+
+    .response-content.active, .response-reasoning.active {
+      display: block;
+    }
+
+    .loading .spinner {
+      visibility: visible;
+    }
+
+    .error-message {
+      color: #e74c3c;
+      margin-top: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .api-form, .response-container {
+        padding: 1.5rem;
+      }
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      padding: 1rem;
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .api-toggle {
+      display: flex;
+      margin-bottom: 1.5rem;
+      background-color: #eee;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+    }
+
+    .api-toggle button {
+      flex: 1;
+      padding: 0.8rem;
+      background: transparent;
+      color: var(--text-color);
+      border: none;
+      border-radius: 0;
+    }
+
+    .api-toggle button.active {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .env-indicator {
+      font-size: 0.8rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      padding: 4px;
+      background-color: #f0f0f0;
+      border-radius: 4px;
+    }
+
+    .local {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .production {
+      background-color: #cce5ff;
+      color: #004085;
+    }
+
+    .typewriter-cursor {
+      display: inline-block;
+      width: 0.5rem;
+      height: 1.2rem;
+      background-color: var(--text-color);
+      margin-left: 2px;
+      animation: blink 0.7s infinite;
+    }
+    
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    
+    .show-answer-btn {
+      display: none;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .show-answer-btn:hover {
+      background-color: #45a049;
+    }
+    
+    .show-answer-btn:active {
+      transform: translateY(1px);
+    }
+    
+    .thinking-indicator {
+      font-style: italic;
+      color: #666;
+      margin-bottom: 0.5rem;
+    }
+    
+    .hidden {
+      display: none !important;
+    }
+
+    /* Responsive styles for mobile devices */
+    @media (max-width: 768px) {
+      .container {
+        width: 95%;
+        margin: 10px auto;
+        padding: 15px;
+      }
+      
+      .tabs {
+        flex-direction: column;
+      }
+      
+      .tabs button {
+        width: 100%;
+        margin-bottom: 5px;
+      }
+      
+      .input-container {
+        flex-direction: column;
+      }
+      
+      textarea, select {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+      
+      button#submit {
+        width: 100%;
+      }
+      
+      .show-answer-btn {
+        width: 100%;
+      }
+      
+      .thinking-indicator {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+    
+    /* Enhance the typewriter effect for better visibility */
+    .typewriter-cursor {
+      display: inline-block;
+      width: 3px;
+      height: 20px;
+      background-color: #333;
+      animation: blink 1s step-end infinite;
+      margin-left: 2px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>DeepCoder AI API Demo</h1>
+    <p class="subtitle">Experience the power of DeepCoder AI models</p>
+  </header>
+
+  <div class="container">
+    <div id="env-indicator" class="env-indicator">
+      Checking environment...
+    </div>
+
+    <div class="api-form">
+      <div class="api-toggle">
+        <button id="direct-api-btn" class="active">Direct API</button>
+        <button id="rapid-api-btn">RapidAPI</button>
+      </div>
+
+      <div class="form-group">
+        <label for="api-key">API Key:</label>
+        <input type="text" id="api-key" placeholder="Enter your API key" />
+      </div>
+
+      <div class="form-group">
+        <label for="model">Model:</label>
+        <input type="text" id="model" value="agentica-org/deepcoder-14b-preview:free" />
+      </div>
+
+      <div class="form-group">
+        <label for="prompt">Your message:</label>
+        <textarea id="prompt" placeholder="Type your message here...">What are the three laws of robotics?</textarea>
+      </div>
+
+      <div class="form-group">
+        <button id="submit-btn">
+          <span class="spinner"></span>
+          Submit
+        </button>
+        <p class="error-message" id="error-message"></p>
+      </div>
+    </div>
+
+    <div class="response-container">
+      <div class="response-header">
+        <h2>Response</h2>
+        <div>
+          <button id="copy-btn">Copy</button>
+        </div>
+      </div>
+      <div class="thinking-indicator" id="thinking-indicator">
+        <span>AI thinking...</span>
+      </div>
+      <div class="response-tabs">
+        <button id="content-tab" class="active">Response</button>
+        <button id="reasoning-tab">Reasoning</button>
+      </div>
+      <div id="response-content" class="response-content">
+        Your response will appear here...
+      </div>
+      <div id="response-reasoning" class="response-reasoning active">
+        <div id="typewriter-text"></div>
+        <span class="typewriter-cursor" id="typewriter-cursor"></span>
+        <div class="hidden" id="show-answer-container">
+          <button id="show-answer-btn" class="show-answer-btn">Show Answer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Powered by DeepCoder AI API | <a href="https://github.com/your-username/deepseek-api-creation" target="_blank">GitHub</a></p>
+  </footer>
+
+  <script>
+    // DOM Elements
+    const apiKeyInput = document.getElementById('api-key');
+    const modelInput = document.getElementById('model');
+    const promptInput = document.getElementById('prompt');
+    const submitBtn = document.getElementById('submit-btn');
+    const responseContent = document.getElementById('response-content');
+    const responseReasoning = document.getElementById('response-reasoning');
+    const contentTab = document.getElementById('content-tab');
+    const reasoningTab = document.getElementById('reasoning-tab');
+    const errorMessage = document.getElementById('error-message');
+    const copyBtn = document.getElementById('copy-btn');
+    const directApiBtn = document.getElementById('direct-api-btn');
+    const rapidApiBtn = document.getElementById('rapid-api-btn');
+    const envIndicator = document.getElementById('env-indicator');
+    const typewriterText = document.getElementById('typewriter-text');
+    const typewriterCursor = document.getElementById('typewriter-cursor');
+    const showAnswerBtn = document.getElementById('show-answer-btn');
+    const showAnswerContainer = document.getElementById('show-answer-container');
+    const thinkingIndicator = document.getElementById('thinking-indicator');
+
+    // API Configuration
+    let useDirectApi = true;
+    
+    // Detect environment
+    const isLocalDevelopment = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
+    const localApiUrl = 'http://localhost:3000';
+    const productionApiUrl = 'https://deepcoder-api.onrender.com';
+    const directApiUrl = isLocalDevelopment ? localApiUrl : productionApiUrl;
+    const rapidApiUrl = 'https://deepcoder-ai-api.p.rapidapi.com';
+    
+    // Update UI to show environment
+    if (isLocalDevelopment) {
+      envIndicator.textContent = 'LOCAL DEVELOPMENT MODE - Using localhost API';
+      envIndicator.classList.add('local');
+      console.log('Local development mode detected. Using API at:', localApiUrl);
+    } else {
+      envIndicator.textContent = 'PRODUCTION MODE - Using deployed API';
+      envIndicator.classList.add('production');
+      console.log('Production mode detected. Using API at:', productionApiUrl);
+    }
+
+    // Toggle between Direct API and RapidAPI
+    directApiBtn.addEventListener('click', () => {
+      useDirectApi = true;
+      directApiBtn.classList.add('active');
+      rapidApiBtn.classList.remove('active');
+      apiKeyInput.placeholder = useDirectApi ? 'No API key needed for direct API' : 'Enter your RapidAPI key';
+    });
+
+    rapidApiBtn.addEventListener('click', () => {
+      useDirectApi = false;
+      rapidApiBtn.classList.add('active');
+      directApiBtn.classList.remove('active');
+      apiKeyInput.placeholder = 'Enter your RapidAPI key';
+    });
+
+    // Tab switching
+    contentTab.addEventListener('click', () => {
+      contentTab.classList.add('active');
+      reasoningTab.classList.remove('active');
+      responseContent.classList.add('active');
+      responseReasoning.classList.remove('active');
+    });
+
+    reasoningTab.addEventListener('click', () => {
+      reasoningTab.classList.add('active');
+      contentTab.classList.remove('active');
+      responseReasoning.classList.add('active');
+      responseContent.classList.remove('active');
+    });
+
+    // Submit the prompt
+    submitBtn.addEventListener('click', async () => {
+      const model = modelInput.value.trim();
+      const prompt = promptInput.value.trim();
+      const apiKey = apiKeyInput.value.trim();
+
+      // Validate inputs
+      if (!prompt) {
+        showError('Please enter a message.');
+        return;
+      }
+
+      if (!useDirectApi && !apiKey) {
+        showError('RapidAPI key is required.');
+        return;
+      }
+
+      // Clear previous errors and response areas
+      clearError();
+      typewriterText.textContent = '';
+      responseContent.textContent = '';
+      
+      // Hide the show answer button and show thinking indicator
+      showAnswerContainer.classList.add('hidden');
+      thinkingIndicator.classList.remove('hidden');
+
+      // Show loading state
+      submitBtn.classList.add('loading');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Processing...';
+
+      try {
+        let response;
+        
+        if (useDirectApi) {
+          // Direct API call
+          console.log('Making request to:', `${directApiUrl}/api/chat/completions`);
+          
+          response = await fetch(`${directApiUrl}/api/chat/completions`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              model,
+              messages: [
+                {
+                  role: 'user',
+                  content: prompt
+                }
+              ]
+            })
+          });
+        } else {
+          // RapidAPI call
+          console.log('Making request to RapidAPI');
+          
+          response = await fetch(`${rapidApiUrl}/api/chat/completions`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-RapidAPI-Key': apiKey,
+              'X-RapidAPI-Host': 'deepcoder-ai-api.p.rapidapi.com'
+            },
+            body: JSON.stringify({
+              model,
+              messages: [
+                {
+                  role: 'user',
+                  content: prompt
+                }
+              ]
+            })
+          });
+        }
+
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          console.error('Error response:', errorData);
+          throw new Error(errorData.error || errorData.message || `HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Received data:', data);
+        
+        // Extract the message content and reasoning
+        if (data.choices && data.choices.length > 0) {
+          const message = data.choices[0].message;
+          
+          // First hide both tabs and show only the reasoning section
+          contentTab.classList.remove('active');
+          reasoningTab.classList.add('active');
+          responseContent.classList.remove('active');
+          responseReasoning.classList.add('active');
+          
+          // Store the content for later display
+          responseContent.textContent = message.content;
+          
+          // If reasoning is available, show the thinking process first
+          if (message.reasoning) {
+            reasoningTab.style.display = 'block';
+            thinkingIndicator.classList.remove('hidden');
+            
+            // Start the typewriter effect
+            await typewriterEffect(message.reasoning, typewriterText);
+            
+            // After typing is complete, show the "Show Answer" button
+            thinkingIndicator.classList.add('hidden');
+            showAnswerContainer.classList.remove('hidden');
+            
+            // When "Show Answer" is clicked, switch to content tab
+            showAnswerBtn.addEventListener('click', () => {
+              contentTab.classList.add('active');
+              reasoningTab.classList.remove('active');
+              responseContent.classList.add('active');
+              responseReasoning.classList.remove('active');
+              showAnswerContainer.classList.add('hidden');
+            }, { once: true });
+          } else {
+            // If no reasoning data is available
+            typewriterText.textContent = 'No reasoning data available for this response.';
+            reasoningTab.style.display = 'none';
+            
+            // Automatically switch to content tab after a short delay
+            setTimeout(() => {
+              contentTab.classList.add('active');
+              reasoningTab.classList.remove('active');
+              responseContent.classList.add('active');
+              responseReasoning.classList.remove('active');
+            }, 1500);
+          }
+        } else {
+          responseContent.textContent = 'No response content found.';
+          typewriterText.textContent = 'No reasoning data available.';
+          reasoningTab.style.display = 'none';
+          
+          // Show content tab by default if no data
+          contentTab.classList.add('active');
+          reasoningTab.classList.remove('active');
+          responseContent.classList.add('active');
+          responseReasoning.classList.remove('active');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showError(error.message || 'An error occurred while calling the API.');
+        
+        // Hide thinking indicator
+        thinkingIndicator.classList.add('hidden');
+        
+        // Display error message with typewriter effect
+        contentTab.click();
+        reasoningTab.style.display = 'none';
+        await typewriterEffect(`Error: ${error.message || 'An error occurred while calling the API.'}`);
+        
+        // Reset button state
+        submitBtn.textContent = 'Submit';
+      } finally {
+        // Reset loading state
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit';
+      }
+    });
+
+    // Copy response to clipboard
+    copyBtn.addEventListener('click', () => {
+      // Determine which content to copy based on active tab
+      let content;
+      if (responseContent.classList.contains('active')) {
+        content = responseContent.textContent;
+      } else if (responseReasoning.classList.contains('active')) {
+        content = responseReasoning.textContent;
+      }
+      
+      if (content && 
+          content !== 'Your response will appear here...' && 
+          content !== 'Loading...' &&
+          content !== 'Reasoning will appear here when available...' &&
+          content !== 'No reasoning data available for this response.' &&
+          content !== 'No reasoning data available.' &&
+          content !== 'Error occurred. See details above.') {
+        
+        navigator.clipboard.writeText(content)
+          .then(() => {
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => {
+              copyBtn.textContent = originalText;
+            }, 2000);
+          })
+          .catch(err => {
+            console.error('Failed to copy: ', err);
+            showError('Failed to copy to clipboard');
+          });
+      }
+    });
+
+    // Add the typewriter effect function
+    async function typewriterEffect(text, element = typewriterText, speed = 20) {
+      // Clear any existing content
+      element.textContent = '';
+      
+      // Make sure cursor is visible
+      typewriterCursor.style.display = 'inline-block';
+      
+      // Type each character with a delay
+      for (let i = 0; i < text.length; i++) {
+        element.textContent += text.charAt(i);
+        await new Promise(resolve => setTimeout(resolve, speed));
+      }
+      
+      // Keep cursor visible at the end
+      typewriterCursor.style.display = 'inline-block';
+    }
+
+    // Helper functions
+    function showError(message) {
+      errorMessage.textContent = message;
+    }
+
+    function clearError() {
+      errorMessage.textContent = '';
+    }
+  </script>
+</body>
+</html> 

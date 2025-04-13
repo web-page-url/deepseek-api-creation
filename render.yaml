@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: deepcoder-api
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: SITE_URL
+        value: https://deepcoder-api.onrender.com
+      - key: SITE_NAME
+        value: DeepCoder AI API
+      - key: PORT
+        value: 10000
+    plan: free
+    healthCheckPath: /health 
